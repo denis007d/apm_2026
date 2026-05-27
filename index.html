@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de Convocação</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #222;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 8px;
+    }
+    p {
+      margin: 0 0 20px;
+      color: #555;
+    }
+    .box {
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    table {
+      width: 100% !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Lista de Convocação</h1>
+    <p>Pesquise por nome, inscrição, cidade, estado ou cota.</p>
+
+    <div class="box">
+      <table id="tabela" class="display">
+        <thead>
+          <tr>
+            <th>Estado</th>
+            <th>Cidade</th>
+            <th>Ordem</th>
+            <th>Class. Geral AC</th>
+            <th>Class. na Cota</th>
+            <th>Inscrição</th>
+            <th>Nome</th>
+            <th>Nota Final</th>
+            <th>Cota</th>
+            <th>Vaga Ocupada</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function carregarTabela() {
+      const resposta = await fetch('lista_convocacao_final_simplificada.csv');
+      const texto = await resposta.text();
+
+      const dados = Papa.parse(texto, {
+        header: true,
+        skipEmptyLines: true
+      }).data;
+
+      const tbody = document.querySelector('#tabela tbody');
+
+      dados.forEach(linha => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${linha.estado || ''}</td>
+          <td>${linha.cidade || ''}</td>
+          <td>${linha.ordem_convocacao || ''}</td>
+          <td>${linha.classificacao_geral_ac || ''}</td>
+          <td>${linha.classificacao_na_cota || ''}</td>
+          <td>${linha.inscricao || ''}</td>
+          <td>${linha.nome || ''}</td>
+          <td>${linha.nota_final || ''}</td>
+          <td>${linha.cota_inscricao || ''}</td>
+          <td>${linha.vaga_ocupada || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      new DataTable('#tabela', {
+        pageLength: 25,
+        language: {
+          url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/pt-BR.json'
+        }
+      });
+    }
+
+    carregarTabela();
+  </script>
+</body>
+</html>
